@@ -35,11 +35,11 @@ function init() {
         }
     ]).then(responds => {
         if (responds.options === "View all departments") {
-            viewDepartments()
+            viewDepartment()
         } else if (responds.options === "View all roles") {
-            checkRoles()
+            viewRoles()
         } else if (responds.options === "View all employees") {
-            viewEmps()
+            viewEmployees()
         } else if (responds.options === "Add department") {
             addDept()
         } else if (responds.options === "Add role") {
@@ -53,7 +53,7 @@ function init() {
 }
 
 //FUNCTION RENDERS ALL AVAILABLE DEPARTMENTS
-function viewDept() {
+function viewDepartment() {
     db.query("SELECT * FROM departments", (err, data) => {
         console.table(data)
         init()
@@ -61,7 +61,7 @@ function viewDept() {
 }
 
 //FUNCRION RENDERS ALL AVAILABLE ROLES
-function checkRoles() {
+function viewRoles() {
     db.query("SELECT roles.id, roles.title, departments.name AS department, roles.salary FROM roles INNER JOIN departments ON roles.department_id = departments.id", (err, data) => {
         console.table(data)
         init()
@@ -69,7 +69,7 @@ function checkRoles() {
 }
 
 //FUNCTION RENDER ALL AVAILABLE EMPLOYEES
-function viewEmps() {
+function viewEmployees() {
     db.query(`SELECT employees.id, employees.first_name, employees.last_name, roles.title,
     departments.name AS department, roles.salary,
     CONCAT (manager.first_name, " ", manager.last_name)
@@ -86,7 +86,7 @@ function viewEmps() {
 function addDept() {
     inquirer.prompt([{
         type: "input",
-        name: "addDept",
+        name: "addDepartment",
         message: "What is the new department would you like to add?",
     }])
         .then(responds => {
@@ -173,3 +173,33 @@ function addEmp() {
     })
     }
 
+//FUNCTION UPDATES EMPLOYEE ROLES INSIDE DATABASE
+function updateREmp() {
+    db.query("SELECT CONCAT(first_name,' ', last_name) name , id value FROM employees", (err, data) => {
+        db.query("SELECT title name, id value FROM roles ", (err, roleData) => {
+
+        
+    
+    inquirer.prompt([{
+        type: "list",
+        name: "employeeUpdate",
+        message: "Which employee's role would you like to update?",
+        choices: data
+    },
+    {
+        type: "list",
+        name: "newRole",
+        message: "Which new role would you like to assign for the selected employee?",
+        choices: roleData
+    }])
+        .then(responds => {
+            db.query(
+                "UPDATE employees SET role_id =? WHERE id=?",
+                [responds.newRole, responds.employeeUpdate], (error) => {
+                    init()
+                }
+            )
+        })
+    }) 
+})
+}
