@@ -97,4 +97,79 @@ function addDept() {
         })
 }
 
-//
+//FUNCTION ADDS NEW ROLE IN CHOOSEN DEPT AND INSIDE DATABASE
+function addRole() {
+    db.query("SELECT name ,id value FROM departments",(err, data) => {
+        
+    
+    inquirer.prompt([{
+        type: "input",
+        name: "addRole",
+        message: "What is the new role would you like to add?",
+    },
+    {
+        type: "input",
+        name: "salary",
+        message: "What is the salary for the new role?"
+    },
+    {
+        type: "list",
+        name: "departmentId",
+        message: "Which department does the new role belongs to?",
+        choices: data
+    }
+    ])
+        .then(responds => {
+
+            db.query(
+                `INSERT INTO roles(title, salary, department_id) VALUES(?, ?, ${parseInt(responds.departmentId)})`,
+                [responds.addRole, responds.salary, responds.departmentId], (err) => {
+                    console.log(`New role has been added sucesfully`)
+                    init()
+                })
+        })
+    })
+}
+
+//FUNCTION CREATES AN EMPLOYEE INSIDE THE DATABASE
+function addEmp() {
+    db.query("SELECT title name, id value FROM roles", (err, data) => {
+        db.query("SELECT CONCAT(first_name,' ', last_name) name, id value FROM employees", (err, newData) => {
+
+       
+        
+    
+    inquirer.prompt([{
+        type: "input",
+        name: "name",
+        message: "What is the new employee's first name?"
+    },
+    {
+        type: "input",
+        name: "lastName",
+        message: "What is the new employee's last name?"
+    },
+    {
+        type: "list",
+        name: "roleId",
+        message: "What is the new employee's role?",
+        choices: data
+    },
+    {
+        type: "list",
+        name: "managerId",
+        message: "Who is the new employee's manager?",
+        choices: newData
+    }])
+        .then(responds => {
+            db.query(
+                `INSERT INTO employees(first_name, last_name, role_id, manager_id) VALUES(?, ?, ${parseInt(responds.roleId)}, ${parseInt(responds.managerId)})`,
+                [responds.name, responds.lastName, responds.roleId, responds.managerId], (err) => {
+                    console.log(`New employee has been added sucesfully`)
+                    init()
+                })
+        })
+    })
+    })
+    }
+
