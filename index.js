@@ -81,3 +81,20 @@ function viewEmps() {
         init()
     })
 }
+
+//FUNCTION ADDS NEW DEPARTMENT INSIDE THE DATABASE
+function addDept() {
+    inquirer.prompt([{
+        type: "input",
+        name: "addDept",
+        message: "What is the new department would you like to add?",
+    }])
+        .then(responds => {
+            db.query("INSERT INTO departments(name) VALUES(?)", [responds.addDept], (err) => {
+                console.log(`New department has been added sucessfully!`)
+                init()
+            })
+        })
+}
+
+//
